@@ -1,0 +1,40 @@
+name: Using composite
+
+on:
+  workflow_dispatch:
+
+jobs:
+  process:
+    if: github.repository == 'B-a-S/using-composite'
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: show tree
+      run: |
+        tree ./
+        pwd
+
+    - name: Use Composite Action
+      uses: B-a-S/test-composite/yaml@master
+      with:
+        file: /github/workspace/_actions/B-a-S/test-composite/master/k8s_template/test_pod.yaml
+        vars: |-
+           K8s_SUB_DOMAIN=compositedomain \
+           K8s_NAMESPACE=composite-ci \
+           K8s_POD_NAME_1=composite01 \
+           K8s_POD1_HOST=swx-phaeton01 \
+           K8s_POD_HOSTNAME_1=composite01 \
+           K8s_WORKDIRonHOST=/GIT/runners \
+           K8s_DNS_IP=10.233.0.3 \
+           K8s_IMG_1=rdmz-harbor.rdmz.labs.mlnx/swx-storage/rdmz-phaeton/ucc-ci-rdmz/ubuntu2004:latest
+
+    - name: show enironment
+      run: env | egrep K8s
+
+    - name: show tree again
+      run: |
+        kubectl get pods
+        env > /actions-runner/env1
